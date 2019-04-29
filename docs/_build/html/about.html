@@ -1,0 +1,482 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>About &#8212; Charon  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <script type="text/javascript" src="_static/copybutton.js"></script>
+    <link rel="author" title="About these documents" href="#" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Quickstart" href="quickstart.html" />
+    <link rel="prev" title="Structsure Charon: MongoDB Security Monitor" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="about">
+<h1>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h1>
+<p>Charon is a security monitor that enforces fine-grained Advanced Security Context Labeling (ASCL) for data stored in MongoDB collections.</p>
+<p>Charon uses <a class="reference external" href="https://docs.python-eve.org/en/stable/">Eve</a> to provide a REST API for database operations. API calls enforce schema rules (for <code class="docutils literal notranslate"><span class="pre">insert</span></code> and <code class="docutils literal notranslate"><span class="pre">update</span></code>) and perform data redaction (for <code class="docutils literal notranslate"><span class="pre">find</span></code>).</p>
+</div>
+<div class="section" id="setup">
+<h1>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h1>
+<p>If you want to get up and running quickly, see the <a class="reference internal" href="#quickstart">Quickstart</a>.</p>
+<div class="section" id="building-charon">
+<span id="quickstart"></span><h2>Building Charon<a class="headerlink" href="#building-charon" title="Permalink to this headline">¶</a></h2>
+<p>Get the Charon image by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">pull</span> <span class="n">structsure</span><span class="o">-</span><span class="n">charon</span>
+</pre></div>
+</div>
+<p>If using Docker run, create a local bridge network to connect to your container:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">network</span> <span class="n">create</span> <span class="o">--</span><span class="n">driver</span> <span class="n">bridge</span> <span class="n">charon</span><span class="o">-</span><span class="n">network</span>
+</pre></div>
+</div>
+<p>Follow the instructions in the next section to set the environment variables in a file called <code class="docutils literal notranslate"><span class="pre">env.list</span></code>, then continue to the next step to run the container.</p>
+<p>Then, run the container:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">run</span> <span class="o">-</span><span class="n">p</span> <span class="mi">5000</span><span class="p">:</span><span class="mi">5000</span><span class="o">/</span><span class="n">tcp</span> <span class="o">--</span><span class="n">env</span><span class="o">-</span><span class="n">file</span> <span class="n">env</span><span class="o">.</span><span class="n">list</span> <span class="o">--</span><span class="n">network</span><span class="o">=</span><span class="n">charon</span><span class="o">-</span><span class="n">network</span> <span class="n">structsure</span><span class="o">-</span><span class="n">charon</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="environment-variables">
+<h2>Environment Variables<a class="headerlink" href="#environment-variables" title="Permalink to this headline">¶</a></h2>
+<p>The Charon instance is configured by passing environment variables to the Docker container.</p>
+<p>If you are using Docker run, you can do this by creating a file to hold the variables (e.g. <code class="docutils literal notranslate"><span class="pre">env.list</span></code>) and then passing it in the Docker run command by including <code class="docutils literal notranslate"><span class="pre">--env-file</span> <span class="pre">env.list</span></code>. Make sure to keep this file secret - add it to your project’s <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> to prevent accidental inclusion in version control.</p>
+<p>The following environment variables must be included:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>- SCHEMA
+    - A json string describing the schema for objects managed by Charon. See the Schema Enforcement section for more info.
+    - Required
+- MONGO_DBNAME
+    - The name of the Mongo DB used with Charon.
+    - Required
+- MONGO_HOST
+    - The hostname for the Mongo instance to be used with Charon. For example, if using a Docker container for Mongo, this is the container name.
+    - Required
+- MONGO_PORT
+    - The port number used by the Mongo instance.
+    - Optional, defaults to ``27017``, the default Mongo port.
+- MONGO_USERNAME
+    - The username for a service user in Mongo that has full permissions.
+    - Optional, defaults to ``&quot;&quot;``.
+- MONGO_PASSWORD
+    - The password for the user specified in MONGO_USERNAME.
+    - Optional, defaults to ``&quot;&quot;``.
+- MONGO_AUTH_SOURCE
+    - The Mongo database where user credentials are stored. E.g. ``admin``
+    - Optional, defaults to ``&quot;admin&quot;``.
+- S3_ATTACHMENTS
+    - Set to true to store documents in the ``attachments.documents`` field in S3.
+    - Optional, defaults to ``False``.
+- AWS_ACCESS_KEY
+    - If using the ``S3_ATTACHMENTS``, the AWS Access Key
+    - Required if S3_ATTACHMENTS = True
+- AWS_SECRET_KEY
+    - If using the ``S3_ATTACHMENTS``, the AWS Secret Access Key
+    - Required if S3_ATTACHMENTS = True
+- AWS_S3_BUCKET_NAME
+    - If using the ``S3_ATTACHMENTS``, the name of the S3 bucket. (Do not include ``s3://``.)
+    - Required if S3_ATTACHMENTS = True
+</pre></div>
+</div>
+</div>
+<div class="section" id="docker-network">
+<h2>Docker Network<a class="headerlink" href="#docker-network" title="Permalink to this headline">¶</a></h2>
+<p>Charon is designed to run as a Docker container and runs on port <code class="docutils literal notranslate"><span class="pre">5000</span></code>. You will need to make port 5000 accessible for the Docker container, and make sure the Mongo instance can be reached from the Charon Docker container.</p>
+<p>If you are using Docker run, you can set up a Docker network using the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">network</span> <span class="n">create</span> <span class="o">--</span><span class="n">driver</span> <span class="n">bridge</span> <span class="n">charon</span><span class="o">-</span><span class="n">network</span>
+</pre></div>
+</div>
+<p>Then, when running the Charon Docker container, include <code class="docutils literal notranslate"><span class="pre">--network=charon-network</span></code> in the run command.</p>
+</div>
+<div class="section" id="nginx">
+<h2>Nginx<a class="headerlink" href="#nginx" title="Permalink to this headline">¶</a></h2>
+<p>Charon requires API calls to include the requester’s security context to evaluate the security rules in the data structure (to redact data or disallow writing data the user does not have permission to write). However, Charon does not include a system to authenticate the information in these requests. It should be run in a trusted environment; for example, run Charon behind nginx, and have nginx perform authentication.</p>
+</div>
+<div class="section" id="mongo">
+<h2>Mongo<a class="headerlink" href="#mongo" title="Permalink to this headline">¶</a></h2>
+<p>If you don’t already have a MongoDB instance to use with Charon, you can easily set one up using Docker.</p>
+<p>Get the Mongo image: <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">pull</span> <span class="pre">mongo</span></code></p>
+<p>By default, your Mongo instance will run on port <code class="docutils literal notranslate"><span class="pre">27017</span></code>. If you change the port, make sure to update the <code class="docutils literal notranslate"><span class="pre">MONGO_PORT</span></code> environment variable for Charon.</p>
+<p>If using Docker run, create a Mongo container that runs on the Docker network you created: <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">run</span> <span class="pre">-p</span> <span class="pre">27017:27017</span> <span class="pre">--network=charon-network</span> <span class="pre">--name=charon-mongo</span> <span class="pre">mongo</span></code></p>
+</div>
+</div>
+<div class="section" id="config">
+<h1>Config<a class="headerlink" href="#config" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="auth-system">
+<h2>Auth System<a class="headerlink" href="#auth-system" title="Permalink to this headline">¶</a></h2>
+<dl class="simple">
+<dt>Charon operates on a Bring Your Own Auth basis. The <code class="docutils literal notranslate"><span class="pre">set_context</span></code> method of <code class="docutils literal notranslate"><span class="pre">auth.py</span></code> receives the resource name, the request object, and the lookup string (if any), and assigns the users security context. The user’s security context consists of:</dt><dd><ul class="simple">
+<li><p>Security Category - a string set in Flask <code class="docutils literal notranslate"><span class="pre">g._cat</span></code></p></li>
+<li><p>Dissemination Rules - a list of strings set in Flask <code class="docutils literal notranslate"><span class="pre">g._diss</span></code></p></li>
+</ul>
+</dd>
+</dl>
+<p>The auth system you add to Charon must set these values based on the data received in the Authentication header. The Authentication header has the form: <code class="docutils literal notranslate"><span class="pre">Authentication:</span> <span class="pre">Basic</span> <span class="pre">some_token_here</span></code>.</p>
+</div>
+</div>
+<div class="section" id="features">
+<h1>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="rest-api">
+<h2>REST API<a class="headerlink" href="#rest-api" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="general-request-format">
+<h3>General Request Format<a class="headerlink" href="#general-request-format" title="Permalink to this headline">¶</a></h3>
+<p>Charon takes HTTP requests and returns json responses. Each collection has two endpoints - one for reading data and one for writing data. These are based off the name of the collection. For example, a collection called <code class="docutils literal notranslate"><span class="pre">users</span></code> would have the read-only endpoint <code class="docutils literal notranslate"><span class="pre">users</span></code> as well as the write-only endpoint <code class="docutils literal notranslate"><span class="pre">users_write</span></code>.</p>
+<p>These endpoints are automatically generated based on the resources in the schema. To add a new endpoint, simply update the schema to include an entry for the new collection.</p>
+<p>Requests must include the user’s security context in request headers. Because the auth system must be added when you deploy Charon, the exact content depends on what your auth system looks like. Charon expects a header of the format: <code class="docutils literal notranslate"><span class="pre">Authentication:</span> <span class="pre">Basic</span> <span class="pre">some_token_here</span></code>. The auth system that you add must use the token value to assign the security rules the user should have based on their identity. See the <code class="docutils literal notranslate"><span class="pre">Auth</span> <span class="pre">System</span></code> section in <code class="docutils literal notranslate"><span class="pre">Config</span></code> for more info.</p>
+</div>
+<div class="section" id="resources">
+<h3>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h3>
+<p>Charon will expose endpoints for each object in the <code class="docutils literal notranslate"><span class="pre">SCHEMA</span></code> environment variable. Each resource will get a read-only and a write-only endpoint in the form <code class="docutils literal notranslate"><span class="pre">resource_name</span></code> and <code class="docutils literal notranslate"><span class="pre">resource_name_write</span></code>.</p>
+<p>For example, the <code class="docutils literal notranslate"><span class="pre">fees</span></code> object has the read-only endpoint <code class="docutils literal notranslate"><span class="pre">fees</span></code> and the write-only endpoint <code class="docutils literal notranslate"><span class="pre">fees_write</span></code>.</p>
+</div>
+<div class="section" id="read">
+<h3>Read<a class="headerlink" href="#read" title="Permalink to this headline">¶</a></h3>
+<p>To retrieve data for the entire collection, send a GET request to the endpoint <code class="docutils literal notranslate"><span class="pre">collectionName</span></code>. To retrieve data for a specific object, send a GET request to <code class="docutils literal notranslate"><span class="pre">collectionName?aggregate={&quot;$id&quot;:</span> <span class="pre">&quot;id_goes_here&quot;}</span></code>, substituting the ID for the object you wish to read.</p>
+<p>At this time, queries are not supported.</p>
+</div>
+<div class="section" id="insert">
+<h3>Insert<a class="headerlink" href="#insert" title="Permalink to this headline">¶</a></h3>
+<p>To insert an object into a collection by sending a POST request to <code class="docutils literal notranslate"><span class="pre">collectionName_write</span></code>. The data, sent as json in the request body, must be valid based on the schema entry for <code class="docutils literal notranslate"><span class="pre">collectionName</span></code>. If the data is not valid, or there is no <code class="docutils literal notranslate"><span class="pre">collectionName</span></code> entry in the schema dict, the insert will be refused.</p>
+</div>
+<div class="section" id="update">
+<h3>Update<a class="headerlink" href="#update" title="Permalink to this headline">¶</a></h3>
+<p>To update an object, send a PATCH request to <code class="docutils literal notranslate"><span class="pre">collectionName_write/object_id</span></code>. Nested fields can be updated by including the full path to that field. If a field that contains multiple subfields is updated, each subfield must be specified.</p>
+<p>Like for inserts, if the data is not valid, or there is no <code class="docutils literal notranslate"><span class="pre">collectionName</span></code> entry in the schema dict, the insert will be refused.</p>
+<p>At this time, document versioning is not supported.</p>
+</div>
+</div>
+<div class="section" id="schema-enforcement">
+<h2>Schema Enforcement<a class="headerlink" href="#schema-enforcement" title="Permalink to this headline">¶</a></h2>
+<p>The schema defines the structure of objects in the database. Although Mongo does not require a schema, Charon enforces schema rules to ensure data integrity. For more information on valid schema formatting, refer to the <a class="reference external" href="https://json-schema.org/">json-schema</a> documentation.</p>
+<p>Charon defines schemas for structures applying security rules (<code class="docutils literal notranslate"><span class="pre">_sec</span></code>) and for storing documents in Amazon S3 (<code class="docutils literal notranslate"><span class="pre">attachments</span></code>). Both structures can be used at the top level of a document or at the field level.</p>
+<div class="section" id="advanced-security-context-labeling-ascl">
+<h3>Advanced Security Context Labeling (ASCL)<a class="headerlink" href="#advanced-security-context-labeling-ascl" title="Permalink to this headline">¶</a></h3>
+<p>ASCL rules control access to objects and specific fields in those objects. To apply ASCL rules, add the <code class="docutils literal notranslate"><span class="pre">_sec</span></code> schema as an attribute of a field. The security context of a request is checked against each ASCL - the request must be assigned the security category (<code class="docutils literal notranslate"><span class="pre">cat</span></code>) and all of the dissemination controls (<code class="docutils literal notranslate"><span class="pre">diss</span></code>) present in the ASCL to pass the check.</p>
+<p>For read requests, the field marked with the ASCL is redacted (along with all sub-fields) if the user context is not valid for that ASCL.</p>
+<p>For inserts, the user context must be valid for all ASCLs contained in the data in the request.</p>
+<p>For updates, the user context must be valid for all ASCLs in the data in the request, and any field that would be overwritten by the data in the request.</p>
+<div class="section" id="ascl-schema">
+<h4>ASCL Schema<a class="headerlink" href="#ascl-schema" title="Permalink to this headline">¶</a></h4>
+<p>The ASCL schema is as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;_sec&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dict&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;cat&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;diss&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="example">
+<h4>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h4>
+<p>Here is a schema for an <code class="docutils literal notranslate"><span class="pre">employee</span></code> object that has an ASCL at the object level and at the field level for the <code class="docutils literal notranslate"><span class="pre">status</span></code> field.</p>
+<p>If the request context fails the ASCL check at the top level, no data will be returned.</p>
+<p>If the request passes to top-level ASCL but fails the <code class="docutils literal notranslate"><span class="pre">status</span></code> ASCL check, the object will be returned without the <code class="docutils literal notranslate"><span class="pre">status</span></code> field - only the <code class="docutils literal notranslate"><span class="pre">name</span></code> field is returned.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;employee&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dict&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;_sec&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dict&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;cat&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+                    <span class="s2">&quot;diss&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;_sec&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dict&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;cat&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;diss&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Here is an example <code class="docutils literal notranslate"><span class="pre">employee</span></code> object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Jane Doe&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;employed&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_sec&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;cat&quot;</span><span class="p">:</span> <span class="s2">&quot;admin&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;diss&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;human_resources&quot;</span><span class="p">,</span> <span class="s2">&quot;dc_office&quot;</span><span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;_sec&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;cat&quot;</span><span class="p">:</span> <span class="s2">&quot;employee&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;diss&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;dc_office&quot;</span><span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Any requester who has the category <code class="docutils literal notranslate"><span class="pre">employee</span></code> and the dissemination control <code class="docutils literal notranslate"><span class="pre">dc_office</span></code> assigned to their profile can see this employee’s name. Only users whose profile contains those attributes and the <code class="docutils literal notranslate"><span class="pre">admin</span></code> security category and <code class="docutils literal notranslate"><span class="pre">human_resources</span></code> dissemination control can see the employee’s status.</p>
+</div>
+</div>
+</div>
+<div class="section" id="s3-attachments">
+<h2>S3 Attachments<a class="headerlink" href="#s3-attachments" title="Permalink to this headline">¶</a></h2>
+<p>To add a field that stores IDs for objects stored in S3, you can add the <code class="docutils literal notranslate"><span class="pre">attachments</span></code> schema to an object or field.</p>
+<p>When this object is inserted, the response will contain a <code class="docutils literal notranslate"><span class="pre">_presigned_urls</span></code> field with urls that include encoded one-time AWS credentials. The client is responsible for using the presigned urls to upload the contents of each document to the S3 bucket.</p>
+<p>When a read is performed, the <code class="docutils literal notranslate"><span class="pre">attachments.documents</span></code> list will contain the data stored in each S3 ID, but only the ID is stored in Mongo.</p>
+<div class="section" id="pros-and-cons-of-s3-attachments">
+<h3>Pros and Cons of S3 Attachments<a class="headerlink" href="#pros-and-cons-of-s3-attachments" title="Permalink to this headline">¶</a></h3>
+<p>This feature reduces the storage requirements for the MongoDB instance. Mongo <a class="reference external" href="https://docs.mongodb.com/manual/core/gridfs/">recommends</a> using GridFS for storing files larger than 16 MB. If you do not have GridFS enabled, you can use set <code class="docutils literal notranslate"><span class="pre">S3_ATTACHMENTS</span> <span class="pre">=</span> <span class="pre">True</span></code> to store only the ID in Mongo.</p>
+<p>The downside of using the <code class="docutils literal notranslate"><span class="pre">S3_ATTACHMENTS</span></code> feature is losing the ability to easily update the list. Because the list of IDs is not returned to the client, there is not a way to add or remove a single element. If the <code class="docutils literal notranslate"><span class="pre">attachments.documents</span></code> list needs to be changed, the client must supply the IDs for each element in the updated list.</p>
+<p>There is an item on the roadmap to add support for attachment updates.</p>
+</div>
+<div class="section" id="attachments-schema">
+<h3>Attachments Schema<a class="headerlink" href="#attachments-schema" title="Permalink to this headline">¶</a></h3>
+<p>The attachments schema is as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;attachments&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dict&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;_sec&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dict&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;cat&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+                <span class="s2">&quot;diss&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;documents&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="example-case">
+<h4>Example Case<a class="headerlink" href="#example-case" title="Permalink to this headline">¶</a></h4>
+<p>Here is a schema for a <code class="docutils literal notranslate"><span class="pre">case</span></code> object with attachments stored in S3:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;case&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;case_number&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;notes&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;attachments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dict&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;_sec&quot;</span><span class="p">:</span> <span class="n">ascl</span><span class="p">,</span>
+            <span class="s2">&quot;documents&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>And an example of a <code class="docutils literal notranslate"><span class="pre">case</span></code> object to be uploaded:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;case_number&quot;</span><span class="p">:</span> <span class="s2">&quot;A1SD2F&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;notes&quot;</span><span class="p">:</span> <span class="s2">&quot;This was a particularly interesting case.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;attachments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;_sec&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;cat&quot;</span><span class="p">:</span> <span class="s2">&quot;employee&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;diss&quot;</span><span class="p">:</span> <span class="p">[]</span>
+        <span class="p">}</span>
+        <span class="s2">&quot;documents&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;1234&quot;</span><span class="p">,</span> <span class="s2">&quot;5678&quot;</span><span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="sample-schema-with-tagged-rules-and-attachments">
+<h2>Sample Schema with Tagged Rules and Attachments<a class="headerlink" href="#sample-schema-with-tagged-rules-and-attachments" title="Permalink to this headline">¶</a></h2>
+<p>The following is an example of a schema entry that includes document level security, field level security (in the signature field), and an attachments field to use the S3 attachments feature.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;signature&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;date&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;signature&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dict&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;_sec&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dict&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;cat&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+                    <span class="s2">&quot;diss&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;attachments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dict&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;_sec&quot;</span><span class="p">:</span> <span class="n">ascl</span><span class="p">,</span>
+            <span class="s2">&quot;documents&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;_sec&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dict&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;cat&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;diss&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="known-issues-future-development">
+<h1>Known Issues &amp; Future Development<a class="headerlink" href="#known-issues-future-development" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="bring-your-own-auth">
+<h2>Bring Your Own Auth<a class="headerlink" href="#bring-your-own-auth" title="Permalink to this headline">¶</a></h2>
+<p>Charon does not include an authentication system. It uses a request header to assign the security context, but does not verify that the user is who they claim to be. Further, Charon does not currently support a method for assigning security context based on the token passed in the auth header.</p>
+<p>While there are improvements to this on the roadmap, the current state of auth is not secure. We suggest running Charon behind nginx and handling auth in nginx.</p>
+</div>
+<div class="section" id="deletes-not-allowed">
+<h2>Deletes not allowed<a class="headerlink" href="#deletes-not-allowed" title="Permalink to this headline">¶</a></h2>
+<p>Delete operations are not permitted by Charon.</p>
+<p>There is an item on the roadmap to support soft deleting and hard deleting items.</p>
+</div>
+<div class="section" id="s3-attachment-updates-are-all-or-nothing">
+<h2>S3 attachment updates are all-or-nothing<a class="headerlink" href="#s3-attachment-updates-are-all-or-nothing" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">attachments</span></code> field cannot be partially modified, it must be completely overwritten. Because the S3 ID is not sent back to the client on a read operation (the data for the document is returned instead) the client cannot simply send a modified list.</p>
+<p>There is an item on the roadmap to improve attachment management.</p>
+</div>
+<div class="section" id="s3-attachment-uploads-carry-risk-of-data-integrity-errors">
+<h2>S3 attachment uploads carry risk of data integrity errors<a class="headerlink" href="#s3-attachment-uploads-carry-risk-of-data-integrity-errors" title="Permalink to this headline">¶</a></h2>
+<p>Because the client is responsible for uploading the document to S3, there is a risk of data integrity issues. For example, if the client fails to upload the document, there will be an ID in Mongo that does not have a corresponding document in S3.</p>
+<p>There is an item on the roadmap to improve data integrity for S3 attachments.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Charon</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#setup">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#building-charon">Building Charon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#environment-variables">Environment Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#docker-network">Docker Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nginx">Nginx</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mongo">Mongo</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#config">Config</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#auth-system">Auth System</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#features">Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#rest-api">REST API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#schema-enforcement">Schema Enforcement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#s3-attachments">S3 Attachments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sample-schema-with-tagged-rules-and-attachments">Sample Schema with Tagged Rules and Attachments</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#known-issues-future-development">Known Issues &amp; Future Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#bring-your-own-auth">Bring Your Own Auth</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#deletes-not-allowed">Deletes not allowed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#s3-attachment-updates-are-all-or-nothing">S3 attachment updates are all-or-nothing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#s3-attachment-uploads-carry-risk-of-data-integrity-errors">S3 attachment uploads carry risk of data integrity errors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Structsure Charon: MongoDB Security Monitor</a></li>
+      <li>Next: <a href="quickstart.html" title="next chapter">Quickstart</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Structsure.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/about.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

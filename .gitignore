@@ -1,0 +1,12 @@
+.env
+*.pyc
+*__pycache__/*
+src/.coverage
+*.crt
+*.log
+.assoc
+.assoc/*
+*.DS_Store
+static/*
+dev/*
+env.list

@@ -1,0 +1,288 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Quickstart &#8212; Charon  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <script type="text/javascript" src="_static/copybutton.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="License" href="license.html" />
+    <link rel="prev" title="About" href="about.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="quickstart">
+<h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h1>
+<p>This guide will walk through setting up a demo instance of Charon.</p>
+<div class="section" id="set-up-charon">
+<h2>Set up Charon<a class="headerlink" href="#set-up-charon" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="create-docker-image">
+<h3>Create Docker Image<a class="headerlink" href="#create-docker-image" title="Permalink to this headline">¶</a></h3>
+<p>Pull the Docker image:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">pull</span> <span class="n">structsure</span><span class="o">/</span><span class="n">charon</span><span class="p">:</span><span class="n">latest</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-config-file">
+<h3>Create config file<a class="headerlink" href="#create-config-file" title="Permalink to this headline">¶</a></h3>
+<p>Charon uses a schema to define the available endpoints and to enforce the data format they will accept. You can read more about creating a schema in the Config section. For now, we’ve included a sample schema that defines a single object, <cite>fees</cite>.</p>
+<p>Create a file called <cite>env.list</cite> and add the following to it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MONGO_DBNAME</span><span class="o">=</span><span class="n">charon</span><span class="o">-</span><span class="n">demo</span><span class="o">-</span><span class="n">db</span>
+<span class="n">MONGO_HOST</span><span class="o">=</span><span class="n">charon</span><span class="o">-</span><span class="n">mongo</span>
+<span class="n">S3_ATTACHMENTS</span><span class="o">=</span><span class="kc">False</span>
+<span class="n">SCHEMA</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fees&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Notes&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span><span class="s2">&quot;FeeAmount&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span><span class="s2">&quot;FeeID&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span><span class="s2">&quot;FeeIssuedDate&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span><span class="s2">&quot;FeeType&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span><span class="s2">&quot;attachments&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dict&quot;</span><span class="p">,</span><span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;_sec&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dict&quot;</span><span class="p">,</span><span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;cat&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span><span class="s2">&quot;diss&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span><span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">}}}},</span><span class="s2">&quot;documents&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">}}},</span><span class="s2">&quot;_sec&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dict&quot;</span><span class="p">,</span><span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;cat&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span><span class="s2">&quot;diss&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span><span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">}}}}}}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-docker-network">
+<h3>Create Docker network<a class="headerlink" href="#create-docker-network" title="Permalink to this headline">¶</a></h3>
+<p>Create a Docker bridge network for your local containers to communicate:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">network</span> <span class="n">create</span> <span class="o">--</span><span class="n">driver</span> <span class="n">bridge</span> <span class="n">charon</span><span class="o">-</span><span class="n">network</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-mongo-instance">
+<h3>Create mongo instance<a class="headerlink" href="#create-mongo-instance" title="Permalink to this headline">¶</a></h3>
+<p>If you have an instance of MongoDB that you want to use for the demo, you can skip this step.</p>
+<p>Pull down the Docker image for Mongo:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">pull</span> <span class="n">mongo</span>
+</pre></div>
+</div>
+<p>Run a container using this image on your bridge network:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">run</span> <span class="o">-</span><span class="n">p</span> <span class="mi">27017</span><span class="p">:</span><span class="mi">27017</span> <span class="o">--</span><span class="n">network</span><span class="o">=</span><span class="n">charon</span><span class="o">-</span><span class="n">network</span> <span class="o">--</span><span class="n">name</span><span class="o">=</span><span class="n">charon</span><span class="o">-</span><span class="n">mongo</span> <span class="n">mongo</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="run-your-charon-instance">
+<h3>Run your Charon instance<a class="headerlink" href="#run-your-charon-instance" title="Permalink to this headline">¶</a></h3>
+<p>Execute the following to run your Charon instance:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">run</span> <span class="o">-</span><span class="n">p</span> <span class="mi">5000</span><span class="p">:</span><span class="mi">5000</span><span class="o">/</span><span class="n">tcp</span> <span class="o">--</span><span class="n">env</span><span class="o">-</span><span class="n">file</span> <span class="n">env</span><span class="o">.</span><span class="n">list</span> <span class="o">--</span><span class="n">network</span><span class="o">=</span><span class="n">charon</span><span class="o">-</span><span class="n">network</span> <span class="n">charon</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="use-the-charon-api">
+<h2>Use the Charon API<a class="headerlink" href="#use-the-charon-api" title="Permalink to this headline">¶</a></h2>
+<p>Charon exposes a REST API for all resources defined in the schema. Each resource will get two endpoints - one for reading (the resource name) and one for writing (the resource name with <code class="docutils literal notranslate"><span class="pre">_write</span></code> appended). For a resource named <code class="docutils literal notranslate"><span class="pre">fees</span></code>, the read endpoint will be <code class="docutils literal notranslate"><span class="pre">/fees</span></code> and the write endpoint will be <code class="docutils literal notranslate"><span class="pre">/fees_write</span></code>.</p>
+<div class="section" id="insert-data">
+<h3>Insert Data<a class="headerlink" href="#insert-data" title="Permalink to this headline">¶</a></h3>
+<p>Here is a sample of a fees object, followed by an example API call to insert it into the database.</p>
+<p>Notice that the insert call uses an HTTP <code class="docutils literal notranslate"><span class="pre">POST</span></code>, and assigns the a header for authorization: <code class="docutils literal notranslate"><span class="pre">Authorization:</span> <span class="pre">Basic</span> <span class="pre">username</span></code>.</p>
+<p>You can change the values of each field, but changing the object format (by removing or adding a field, for example) will cause the insert to fail schema validation. Try it out!</p>
+<p>Changing the values in the <code class="docutils literal notranslate"><span class="pre">_sec</span></code> attachment could cause the insert to fail due to insufficient permissions - stay tuned for the <cite>Assign Security</cite> section for more information.</p>
+<div class="section" id="sample-fees-object">
+<h4>Sample Fees object<a class="headerlink" href="#sample-fees-object" title="Permalink to this headline">¶</a></h4>
+<p>We will be using a <code class="docutils literal notranslate"><span class="pre">fees</span></code> object, which has the following form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;Notes&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FeeAmount&quot;</span> <span class="p">:</span> <span class="s2">&quot;2000.00&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FeeID&quot;</span> <span class="p">:</span> <span class="s2">&quot;441&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FeeIssuedDate&quot;</span> <span class="p">:</span> <span class="s2">&quot;2008-05-23T00:00:00&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FeeType&quot;</span><span class="p">:</span> <span class="s2">&quot;Parking&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;attachments&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;_sec&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;cat&quot;</span> <span class="p">:</span> <span class="s2">&quot;usg_unclassified&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;diss&quot;</span> <span class="p">:</span> <span class="p">[</span> <span class="p">]</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;documents&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;02867bec-d8a2-48fc-a6f7-859888f6883b&quot;</span><span class="p">,</span> <span class="s2">&quot;8375b2c8-b461-4568-b4a3-6d37e05dc750&quot;</span><span class="p">]</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;_sec&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;cat&quot;</span> <span class="p">:</span> <span class="s2">&quot;usg_unclassified&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;diss&quot;</span> <span class="p">:</span> <span class="p">[</span> <span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="sample-api-call">
+<h4>Sample API call<a class="headerlink" href="#sample-api-call" title="Permalink to this headline">¶</a></h4>
+<p>Execute the following curl command to insert the object above. If you would like to modify the data, replace the json object after the <cite>-d</cite> flag with your modified json.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="o">-</span><span class="n">X</span> <span class="n">POST</span> <span class="o">-</span><span class="n">H</span> <span class="s1">&#39;Content-Type: application/json&#39;</span> <span class="o">-</span><span class="n">H</span> <span class="s1">&#39;Authorization: Basic us_topsecret_cumul&#39;</span> <span class="o">-</span><span class="n">d</span> <span class="s1">&#39;{&quot;Notes&quot;: &quot;Sample Fee&quot;,&quot;FeeAmount&quot; : &quot;2000.00&quot;,&quot;FeeID&quot; : &quot;441&quot;,&quot;FeeIssuedDate&quot; : &quot;2008-05-23T00:00:00&quot;,&quot;FeeType&quot;: &quot;Parking&quot;,&quot;attachments&quot;: {&quot;_sec&quot;: {&quot;cat&quot; : &quot;usg_unclassified&quot;,&quot;diss&quot; : [ ]},&quot;documents&quot;: [&quot;02867bec-d8a2-48fc-a6f7-859888f6883b&quot;, &quot;8375b2c8-b461-4568-b4a3-6d37e05dc750&quot;]},&quot;_sec&quot; : {&quot;cat&quot; : &quot;usg_unclassified&quot;,&quot;diss&quot; : [ ]}}&#39;</span> <span class="n">localhost</span><span class="p">:</span><span class="mi">5000</span><span class="o">/</span><span class="n">fees_write</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="read-data">
+<h3>Read Data<a class="headerlink" href="#read-data" title="Permalink to this headline">¶</a></h3>
+<p>Now that you have inserted some data into the database, make a call to read it. You can fetch all data for the collection, or look up by an object ID.</p>
+<div class="section" id="get-all-data-for-the-fees-collection">
+<h4>Get all data for the <cite>fees</cite> collection<a class="headerlink" href="#get-all-data-for-the-fees-collection" title="Permalink to this headline">¶</a></h4>
+<p>Execute the following command to read all the data from the <code class="docutils literal notranslate"><span class="pre">fees</span></code> collection:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="o">-</span><span class="n">X</span> <span class="n">GET</span> <span class="o">-</span><span class="n">H</span> <span class="s1">&#39;Content-Type: application/json&#39;</span> <span class="o">-</span><span class="n">H</span> <span class="s1">&#39;Authorization: Basic us_topsecret_cumul&#39;</span> <span class="n">localhost</span><span class="p">:</span><span class="mi">5000</span><span class="o">/</span><span class="n">fees</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="get-data-for-specific-fees-object">
+<h4>Get data for specific <code class="docutils literal notranslate"><span class="pre">fees</span></code> object<a class="headerlink" href="#get-data-for-specific-fees-object" title="Permalink to this headline">¶</a></h4>
+<p>Individual items can be read by including an aggregation command at the end of the url: <code class="docutils literal notranslate"><span class="pre">?aggregate={&quot;$id&quot;:&quot;id-goes-here&quot;}</span></code>.</p>
+<p>Get the ID for a <code class="docutils literal notranslate"><span class="pre">fees</span></code> object (look in the <code class="docutils literal notranslate"><span class="pre">_id</span></code> field of the response for the whole <code class="docutils literal notranslate"><span class="pre">fees</span></code> collection). Replace <code class="docutils literal notranslate"><span class="pre">id-goes-here</span></code> at the end of the url in the following command, and execute the API call. You will receive data for the object you specified. If you are using curl, make sure to escape your quotation marks.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>curl -X GET -H &#39;Content-Type: application/json&#39; -H &#39;Authorization: Basic us_topsecret_cumul&#39; http://localhost:5000/fees?aggregate={%22$id%22:%22id-goes-here%22}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="update-data">
+<h3>Update Data<a class="headerlink" href="#update-data" title="Permalink to this headline">¶</a></h3>
+<p>You can update an object by passing its ID and specifying the new values of the fields you want to update. Fields that aren’t specified won’t be modified.</p>
+<div class="section" id="modify-the-feeamount-for-a-fees-object">
+<h4>Modify the <code class="docutils literal notranslate"><span class="pre">FeeAmount</span></code> for a <code class="docutils literal notranslate"><span class="pre">fees</span></code> object<a class="headerlink" href="#modify-the-feeamount-for-a-fees-object" title="Permalink to this headline">¶</a></h4>
+<p>Suppose we want to change the Fee Amount to 1000.00. We will execute an HTTP <code class="docutils literal notranslate"><span class="pre">PATCH</span></code> request, specifying the ID of the object to modify, and the changes to make.</p>
+<dl class="simple">
+<dt>This request requires three pieces of information:</dt><dd><ul class="simple">
+<li><p>The ID of the object to be updated, which goes at the end of the url (e.g. for <code class="docutils literal notranslate"><span class="pre">localhost:5000/fees_write/12345</span></code>, <code class="docutils literal notranslate"><span class="pre">12345</span></code> is the ID)</p></li>
+<li><p>The ETag, which you will receive as metadata from a <cite>GET</cite> request. This is sent in a request header: <code class="docutils literal notranslate"><span class="pre">&quot;If-Match:</span> <span class="pre">etag-goes-here&quot;</span></code></p></li>
+<li><p>The data to be modified. This should be in the request body, and should be a json string in the form <code class="docutils literal notranslate"><span class="pre">{&quot;path.to.field&quot;:</span> <span class="pre">&quot;new_value&quot;}</span></code></p></li>
+</ul>
+</dd>
+</dl>
+<p>Call the <code class="docutils literal notranslate"><span class="pre">fees</span></code> read API described above. Then, replace <code class="docutils literal notranslate"><span class="pre">id-goes-here</span></code> and <code class="docutils literal notranslate"><span class="pre">etag-goes-here</span></code> in the following command with the ID and ETag from the response, and execute the curl command.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="o">-</span><span class="n">X</span> <span class="n">PATCH</span> <span class="o">-</span><span class="n">d</span> <span class="s1">&#39;{&quot;FeeAmount&quot;: &quot;1000.00&quot;}&#39;</span> <span class="o">-</span><span class="n">H</span> <span class="s1">&#39;Content-Type: application/json&#39;</span> <span class="o">-</span><span class="n">H</span> <span class="s1">&#39;Authorization: Basic us_topsecret_cumul&#39;</span> <span class="o">-</span><span class="n">H</span> <span class="s2">&quot;If-Match: etag-goes-here&quot;</span> <span class="n">localhost</span><span class="p">:</span><span class="mi">5000</span><span class="o">/</span><span class="n">fees_write</span><span class="o">/</span><span class="nb">id</span><span class="o">-</span><span class="n">goes</span><span class="o">-</span><span class="n">here</span>
+</pre></div>
+</div>
+<p>Now, perform another <code class="docutils literal notranslate"><span class="pre">GET</span></code> request for that object to confirm the Fee Amount was updated to <code class="docutils literal notranslate"><span class="pre">1000.00</span></code>.</p>
+</div>
+</div>
+</div>
+<div class="section" id="use-charon-security-rules">
+<h2>Use Charon Security Rules<a class="headerlink" href="#use-charon-security-rules" title="Permalink to this headline">¶</a></h2>
+<p>Charon implements Advanced Security Context Labels at the object and field level. So far we have authenticated as a user that is granted permissions for all Security Categories up to Top Secret. The data we have entered has a required Security Category of Unclassified, so our user has been able to fully manipulate it.</p>
+<p>To demonstrate how security rules work, we will be authenticate as a user that is only allowed to view items with a Security Category of Unclassified. We will apply the <code class="docutils literal notranslate"><span class="pre">usg_topsecret</span></code> Security Category Label to items to set their required Security Category to Top Secret.</p>
+<div class="section" id="insert-records-with-top-secret-security-category-label">
+<h3>Insert Records with Top Secret Security Category Label<a class="headerlink" href="#insert-records-with-top-secret-security-category-label" title="Permalink to this headline">¶</a></h3>
+<p>To insert a record with a security label, the user must have permissions for that security label. For example, a user who does not have access to read objects labelled Top Secret will not be permitted to write objects labelled Top Secret.</p>
+<p>The following two commands authenticate as the <code class="docutils literal notranslate"><span class="pre">usg_topsecret_cumul</span></code> user, who has Top Secret permission. The first command inserts an object labelled as Top Secret at the object level. The second command inserts an object labelled Unclassified at the object level, but with the <code class="docutils literal notranslate"><span class="pre">attachments</span></code> field labelled Top Secret.</p>
+<div class="section" id="labelled-top-secret-at-the-object-level">
+<h4>Labelled Top Secret at the object level<a class="headerlink" href="#labelled-top-secret-at-the-object-level" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="o">-</span><span class="n">X</span> <span class="n">POST</span> <span class="o">-</span><span class="n">H</span> <span class="s1">&#39;Content-Type: application/json&#39;</span> <span class="o">-</span><span class="n">H</span> <span class="s1">&#39;Authorization: Basic us_topsecret_cumul&#39;</span> <span class="o">-</span><span class="n">d</span> <span class="s1">&#39;{&quot;Notes&quot;: &quot;Object-level Top Secret&quot;,&quot;FeeAmount&quot; : &quot;2000.00&quot;,&quot;FeeID&quot; : &quot;441&quot;,&quot;FeeIssuedDate&quot; : &quot;2008-05-23T00:00:00&quot;,&quot;FeeType&quot;: &quot;Parking&quot;,&quot;attachments&quot;: {&quot;_sec&quot;: {&quot;cat&quot; : &quot;usg_unclassified&quot;,&quot;diss&quot; : [ ]},&quot;documents&quot;: [&quot;02867bec-d8a2-48fc-a6f7-859888f6883b&quot;, &quot;8375b2c8-b461-4568-b4a3-6d37e05dc750&quot;]},&quot;_sec&quot; : {&quot;cat&quot; : &quot;usg_topsecret&quot;,&quot;diss&quot; : [ ]}}&#39;</span> <span class="n">localhost</span><span class="p">:</span><span class="mi">5000</span><span class="o">/</span><span class="n">fees_write</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="labelled-unclassified-at-the-object-level-and-top-secret-for-the-attachments-field">
+<h4>Labelled Unclassified at the object level and Top Secret for the attachments field<a class="headerlink" href="#labelled-unclassified-at-the-object-level-and-top-secret-for-the-attachments-field" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="o">-</span><span class="n">X</span> <span class="n">POST</span> <span class="o">-</span><span class="n">H</span> <span class="s1">&#39;Content-Type: application/json&#39;</span> <span class="o">-</span><span class="n">H</span> <span class="s1">&#39;Authorization: Basic us_topsecret_cumul&#39;</span> <span class="o">-</span><span class="n">d</span> <span class="s1">&#39;{&quot;Notes&quot;: &quot;Attachment field Top Secret&quot;,&quot;FeeAmount&quot; : &quot;2000.00&quot;,&quot;FeeID&quot; : &quot;441&quot;,&quot;FeeIssuedDate&quot; : &quot;2008-05-23T00:00:00&quot;,&quot;FeeType&quot;: &quot;Parking&quot;,&quot;attachments&quot;: {&quot;_sec&quot;: {&quot;cat&quot; : &quot;usg_topsecret&quot;,&quot;diss&quot; : [ ]},&quot;documents&quot;: [&quot;02867bec-d8a2-48fc-a6f7-859888f6883b&quot;, &quot;8375b2c8-b461-4568-b4a3-6d37e05dc750&quot;]},&quot;_sec&quot; : {&quot;cat&quot; : &quot;usg_unclassified&quot;,&quot;diss&quot; : [ ]}}&#39;</span> <span class="n">localhost</span><span class="p">:</span><span class="mi">5000</span><span class="o">/</span><span class="n">fees_write</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="attempt-to-read-data">
+<h3>Attempt to read data<a class="headerlink" href="#attempt-to-read-data" title="Permalink to this headline">¶</a></h3>
+<p>Charon enforces security rules on reads - responses will only contain data that is allowed for the user in the request.</p>
+<p>To demonstrate, we will attempt to read the data that we just inserted using a requesting user without permission to view items labelled Top Secret.</p>
+<p>Do a read for the entire <code class="docutils literal notranslate"><span class="pre">fees</span></code> collection with the <code class="docutils literal notranslate"><span class="pre">us_unclassified_only</span></code> user, then look at the output.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="o">-</span><span class="n">X</span> <span class="n">GET</span> <span class="o">-</span><span class="n">H</span> <span class="s1">&#39;Content-Type: application/json&#39;</span> <span class="o">-</span><span class="n">H</span> <span class="s1">&#39;Authorization: Basic us_unclassified_only&#39;</span> <span class="n">localhost</span><span class="p">:</span><span class="mi">5000</span><span class="o">/</span><span class="n">fees</span>
+</pre></div>
+</div>
+<p>Notice that the first Top Secret object we inserted, with “Object-level Top Secret” in the notes field, does not appear. The second object, with “Attachment field Top Secret” in the notes field, is included in the results but the <code class="docutils literal notranslate"><span class="pre">attachments</span></code> field has been redacted.</p>
+<p>Perform the same read with a user who has Top Secret permissions, and notice that those two objects have been included in their entirety.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="o">-</span><span class="n">X</span> <span class="n">GET</span> <span class="o">-</span><span class="n">H</span> <span class="s1">&#39;Content-Type: application/json&#39;</span> <span class="o">-</span><span class="n">H</span> <span class="s1">&#39;Authorization: Basic us_topsecret_cumul&#39;</span> <span class="n">localhost</span><span class="p">:</span><span class="mi">5000</span><span class="o">/</span><span class="n">fees</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Charon</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about.html#setup">Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about.html#config">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about.html#features">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about.html#known-issues-future-development">Known Issues &amp; Future Development</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#set-up-charon">Set up Charon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#use-the-charon-api">Use the Charon API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#use-charon-security-rules">Use Charon Security Rules</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="about.html" title="previous chapter">About</a></li>
+      <li>Next: <a href="license.html" title="next chapter">License</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Structsure.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/quickstart.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
