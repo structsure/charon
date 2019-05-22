@@ -1,0 +1,56 @@
+[
+    {
+        "FeeAmount": "1.00",
+        "FeeID": "1",
+        "FeeIssuedDate": "5/1/2019",
+        "FeeType": "Parking",
+        "Notes": "all_unclassified",
+        "_sec": {
+            "cat": "usg_unclassified",
+            "diss": []
+        },
+        "attachments": {
+            "_sec": {
+                "cat": "usg_unclassified",
+                "diss": []
+            },
+            "documents": ["1111"]
+        }
+    },
+    {
+        "FeeAmount": "2.00",
+        "FeeID": "2",
+        "FeeIssuedDate": "5/2/2019",
+        "FeeType": "Parking",
+        "Notes": "doc_topsecret",
+        "_sec": {
+            "cat": "usg_topsecret",
+            "diss": []
+        },
+        "attachments": {
+            "_sec": {
+                "cat": "usg_unclassified",
+                "diss": []
+            },
+            "documents": ["2"]
+        }
+    },
+    {
+        "FeeAmount": "3.00",
+        "FeeID": "3",
+        "FeeIssuedDate": "5/3/2019",
+        "FeeType": "Parking",
+        "Notes": "attachments_topsecret",
+        "_sec": {
+            "cat": "usg_unclassified",
+            "diss": []
+        },
+        "attachments": {
+            "_sec": {
+                "cat": "usg_topsecret",
+                "diss": []
+            },
+            "documents": ["3"]
+        }
+    }
+]

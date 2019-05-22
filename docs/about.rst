@@ -1,11 +1,3 @@
-About
-======
-Charon is a security monitor that enforces fine-grained Advanced Security Context Labeling (ASCL) for data stored in MongoDB collections.
-
-Charon uses Eve_ to provide a REST API for database operations. API calls enforce schema rules (for ``insert`` and ``update``) and perform data redaction (for ``find``).
-
-.. _Eve: https://docs.python-eve.org/en/stable/
-
 Setup
 =====
 
@@ -17,7 +9,7 @@ Building Charon
 ---------------
 Get the Charon image by running: ::
 
-    docker pull structsure-charon
+    docker pull structsure/charon:latest
 
 If using Docker run, create a local bridge network to connect to your container: ::
 
@@ -102,11 +94,27 @@ Config
 
 Auth System
 -----------
-Charon operates on a Bring Your Own Auth basis. The ``set_context`` method of ``auth.py`` receives the resource name, the request object, and the lookup string (if any), and assigns the users security context. The user's security context consists of:
-    - Security Category - a string set in Flask ``g._cat``
-    - Dissemination Rules - a list of strings set in Flask ``g._diss``
+Charon uses MongoDB for authorization. Although Charon does not include an authentication mechanism, adding your own authentication is simple.
 
-The auth system you add to Charon must set these values based on the data received in the Authentication header. The Authentication header has the form: ``Authentication: Basic some_token_here``.
+Authorization
+~~~~~~~~~~~~~
+Charon looks for Security Categories and Dissemination Rules for a user in the ``charon_user_permissions`` collection of MongoDB's ``admin`` database. The following is an example user object: :: 
+
+    {
+        "username": "sample_user",
+        "cat": ["usg_confidential"],
+        "diss": ["usg_noforn", "usg_relfvey", "usg_relgbr"]
+    }
+
+This user has perimission to see items labelled with the ``usg_classified`` Security Category, and with Dissemination Rules of ``usg_noforn``, ``usg_relfvey``, and ``usg_relgbr``. 
+
+Authentication
+~~~~~~~~~~~~~~
+To add authentication to Charon, modify the ``authenticate`` method of the ``CharonAuth`` class to verify user credentials against the auth system of your choosing.
+
+The ``authenticate`` method receives the username and password from the request headers, and returns a boolean value for whether the user passes authentication.
+
+The Authentication header has the form: ``Authentication: Basic username_here``.
 
 Features
 ========
@@ -138,11 +146,17 @@ To insert an object into a collection by sending a POST request to ``collectionN
 
 Update
 ~~~~~~
-To update an object, send a PATCH request to ``collectionName_write/object_id``. Nested fields can be updated by including the full path to that field. If a field that contains multiple subfields is updated, each subfield must be specified.
+To update an object, send a ``PATCH`` request to ``collectionName_write/object_id``. Nested fields can be updated by including the full path to that field. If a field that contains multiple subfields is updated, each subfield must be specified.
 
 Like for inserts, if the data is not valid, or there is no ``collectionName`` entry in the schema dict, the insert will be refused.
 
 At this time, document versioning is not supported.
+
+Delete
+~~~~~~
+To delete an object, send a ``DELETE`` request to ``collectionName_write/object_id``. Charon will evaluate security rules in the object to be deleted; if the requesting user fails ASCL checks the object will not be deleted and an `HTTP 405` response will be returned.
+
+No data about what checks failed will be returned to the requester.
 
 Schema Enforcement
 ------------------
@@ -150,7 +164,9 @@ The schema defines the structure of objects in the database. Although Mongo does
 
 .. _json-schema: https://json-schema.org/
 
-Charon defines schemas for structures applying security rules (``_sec``) and for storing documents in Amazon S3 (``attachments``). Both structures can be used at the top level of a document or at the field level.
+Charon also uses schemas to enforce security rules. Charon defines standard field structures to apply security rules (``_sec``) and to storing documents in Amazon S3 (``attachments``). Both structures can be used at the top level of a document or at the field level. 
+
+To use these features in your schema, you can either include the schema below, in place, or include the field you want to apply the schema to in the ``"vars"`` schema metadata attribute.
 
 Advanced Security Context Labeling (ASCL)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -357,11 +373,9 @@ Charon does not include an authentication system. It uses a request header to as
 
 While there are improvements to this on the roadmap, the current state of auth is not secure. We suggest running Charon behind nginx and handling auth in nginx.
 
-Deletes not allowed
+Soft Deletes
 -------------------
-Delete operations are not permitted by Charon. 
-
-There is an item on the roadmap to support soft deleting and hard deleting items.
+Charon supports Deletions, but does not currently support soft deletes. There is an item on the roadmap to add configurable support for soft deletes.
 
 S3 attachment updates are all-or-nothing
 ----------------------------------------

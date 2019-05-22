@@ -1,0 +1,106 @@
+[
+    {
+        "_sec": {
+            "cat": "usg_unclassified",
+            "diss": []
+        },
+        "attachments": {
+            "_sec": {
+                "cat": "usg_unclassified",
+                "diss": []
+            },
+            "documents": [
+                "02867bec-d8a2-48fc-a6f7-859888f6883b"
+            ]
+        },
+        "date": "1970-01-01T00:00:00Z",
+        "field_ref_id": "2",
+        "name": "all_unclassified",
+        "signature": {
+            "_sec": {
+                "cat": "usg_unclassified",
+                "diss": []
+            },
+            "value": "testing_updates_1"
+        },
+        "user_ref_id": "234567123"
+    },
+    {
+        "_sec": {
+            "cat": "usg_confidential",
+            "diss": []
+        },
+        "attachments": {
+            "_sec": {
+                "cat": "usg_unclassified",
+                "diss": []
+            },
+            "documents": [
+                "02867bec-d8a2-48fc-a6f7-859888f6883b"
+            ]
+        },
+        "date": "1970-01-01T00:00:00Z",
+        "field_ref_id": "2",
+        "name": "doc_confidential",
+        "signature": {
+            "_sec": {
+                "cat": "usg_unclassified",
+                "diss": []
+            },
+            "value": "testing_updates_1"
+        },
+        "user_ref_id": "234567123"
+    },
+    {
+        "_sec": {
+            "cat": "usg_unclassified",
+            "diss": []
+        },
+        "attachments": {
+            "_sec": {
+                "cat": "usg_unclassified",
+                "diss": []
+            },
+            "documents": [
+                "02867bec-d8a2-48fc-a6f7-859888f6883b"
+            ]
+        },
+        "date": "1970-01-01T00:00:00Z",
+        "field_ref_id": "2",
+        "name": "sig_confidential",
+        "signature": {
+            "_sec": {
+                "cat": "usg_confidential",
+                "diss": []
+            },
+            "value": "testing_updates_1"
+        },
+        "user_ref_id": "234567123"
+    },
+    {
+        "_sec": {
+            "cat": "usg_unclassified",
+            "diss": []
+        },
+        "attachments": {
+            "_sec": {
+                "cat": "usg_unclassified",
+                "diss": []
+            },
+            "documents": [
+                "02867bec-d8a2-48fc-a6f7-859888f6883b"
+            ]
+        },
+        "date": "1970-01-01T00:00:00Z",
+        "field_ref_id": "2",
+        "name": "sig_diss_controlled",
+        "signature": {
+            "_sec": {
+                "cat": "usg_unclassified",
+                "diss": ["noboby_has_this"]
+            },
+            "value": "testing_updates_1"
+        },
+        "user_ref_id": "234567123"
+    }
+]

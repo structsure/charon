@@ -1,0 +1,92 @@
+[
+    {
+        "username": "us_unclassified_only",
+        "cat": ["usg_unclassified"],
+        "diss": ["usg_noforn", "usg_relfvey", "usg_relgbr"]
+    },
+    {
+        "username": "us_confidential_only",
+        "cat": ["usg_confidential"],
+        "diss": ["usg_noforn", "usg_relfvey", "usg_relgbr"]
+    },
+    {
+        "username": "us_secret_cumul",
+        "cat": ["usg_unclassified", "usg_confidential", "usg_secret"],
+        "diss": ["usg_noforn", "usg_relfvey", "usg_relgbr"]
+    },
+    {
+        "username": "us_topsecret_cumul",
+        "cat": ["usg_unclassified", "usg_confidential", "usg_secret", "usg_topsecret"],
+        "diss": ["usg_noforn", "usg_relfvey", "usg_relgbr"]
+    },
+    {
+        "username": "us_topsecret_only",
+        "cat": ["usg_topsecret"],
+        "diss": ["usg_noforn", "usg_relfvey", "usg_relgbr"]
+    },
+    {
+        "username": "us_secret_only",
+        "cat": ["usg_secret"],
+        "diss": ["usg_noforn", "usg_relfvey", "usg_relgbr"]
+    },
+    {
+        "username": "can_unclassified",
+        "cat": ["usg_unclassified"],
+        "diss": ["usg_relfvey"]
+    },
+    {
+        "username": "can_confidential_only",
+        "cat": ["usg_confidential"],
+        "diss": ["usg_relfvey"]
+    },
+    {
+        "username": "can_secret_cumul",
+        "cat": ["usg_unclassified", "usg_confidential", "usg_secret"],
+        "diss": ["usg_relfvey"]
+    },
+    {
+        "username": "can_topsecret_cumul",
+        "cat": ["usg_unclassified", "usg_confidential", "usg_secret", "usg_topsecret"],
+        "diss": ["usg_relfvey"]
+    },
+    {
+        "username": "can_topsecret_only",
+        "cat": ["usg_topsecret"],
+        "diss": ["usg_relfvey"]
+    },
+    {
+        "username": "can_secret_only",
+        "cat": ["usg_secret"],
+        "diss": ["usg_relfvey"]
+    },
+    {
+        "username": "gbr_unclassified",
+        "cat": ["usg_unclassified"],
+        "diss": ["usg_relfvey", "usg_relgbr"]
+    },
+    {
+        "username": "gbr_confidential_only",
+        "cat": ["usg_confidential"],
+        "diss": ["usg_relfvey", "usg_relgbr"]
+    },
+    {
+        "username": "gbr_secret_cumul",
+        "cat": ["usg_unclassified", "usg_confidential", "usg_secret"],
+        "diss": ["usg_relfvey", "usg_relgbr"]
+    },
+    {
+        "username": "gbr_topsecret_cumul",
+        "cat": ["usg_unclassified", "usg_confidential", "usg_secret", "usg_topsecret"],
+        "diss": ["usg_relfvey", "usg_relgbr"]
+    },
+    {
+        "username": "gbr_topsecret_only",
+        "cat": ["usg_topsecret"],
+        "diss": ["usg_relfvey", "usg_relgbr"]
+    },
+    {
+        "username": "gbr_secret_only",
+        "cat": ["usg_secret"],
+        "diss": ["usg_relfvey", "usg_relgbr"]
+    }
+]
