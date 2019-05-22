@@ -3,8 +3,11 @@ Eve>=0.8.1
 Cerberus>=1.2
 Events>=0.3
 gunicorn>=19.9.0
+boto
 boto3>=1.9.130
 pytest>=4.3.1
+pytest-cov>=2.6.1
+responses>=0.10.6
 flask-cors>=3.0.7
 sphinx>=2.0.1
 sphinx-copybutton>=0.2.5

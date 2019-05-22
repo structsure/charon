@@ -1,5 +1,5 @@
 from flask import g, current_app
-from schema import get_schema
+from schema import get_security_enabled_fields
 
 
 def handle_id_match_wildcard(pipeline):
@@ -15,55 +15,40 @@ def handle_id_match_wildcard(pipeline):
     return pipeline
 
 
-def before_agg(endpoint, pipeline):
+def add_ascl_redaction(endpoint, pipeline):
+    """
+    Adds a redaction step to the aggregation pipeline for each security enabled field.
+    """
     current_app.logger.debug('Setting up redaction pipeline for {}'.format(endpoint))
-    if endpoint == 'fees_nested' or endpoint == 'fees':
-        pipeline = handle_id_match_wildcard(pipeline)
-        sec_fields = get_security_enabled_fields(endpoint)
 
-        for field in sec_fields:
-            pipeline = redact_field(field, pipeline)
+    pipeline = handle_id_match_wildcard(pipeline)
+    sec_fields = get_security_enabled_fields(endpoint)
+    for field in sec_fields:
+        pipeline = redact_field(field, pipeline)
 
-        # Redact removes any item that contains "false" in cat_matches or diss_matches (including nested items)
-        pipeline.append(redact_logical_AND("$cat_matches"))
-        pipeline.append(redact_logical_AND("$diss_matches"))
+    # Redact removes any item that contains "false" in cat_matches or diss_matches (including nested items)
+    pipeline.append(redact_logical_AND("$cat_matches"))
+    pipeline.append(redact_logical_AND("$diss_matches"))
 
-        metadata_fields = []
-        metadata_fields.append("cat_matches")
-        metadata_fields.append("diss_matches")
-        pipeline.append(remove_metadata_fields(metadata_fields))
-    elif endpoint == 'signature':
-        pipeline = handle_id_match_wildcard(pipeline)
+    metadata_fields = []
+
+    for field in sec_fields:
+        # Add `.` as field separator for securitized fields. Don't add for object-level security label.
+        if field != '':
+            field = '{}.'.format(field)
+        metadata_fields.append("{}cat_matches".format(field))
+        metadata_fields.append("{}diss_matches".format(field))
+    pipeline.append(remove_metadata_fields(metadata_fields))
 
     current_app.logger.debug('Pipeline: {}'.format(pipeline))
 
 
-def get_security_enabled_fields(schema_name):
-    schema = get_schema(schema_name)
-    return parse(schema, [""])
-
-
-def parse(current, fields):
-    if type(current) == dict:
-        for key, value in current.items():
-            if type(value) == dict and value.get('schema') is not None:
-                # Check if this schema includes security rules
-                if value.get('schema').get('_sec') is not None:
-                    print('adding field: {}'.format(key))
-                    fields.append(key)
-                # Recurse on any key that has schema fields
-                fields = parse(value.get('schema'), fields)
-    return fields
-
-
 def redact_field(path, pipeline):
     """
-        Register a field as security-labelled with the _sec tag. Path should be in the format TopField.SubField
-        The first field should be at the top level of the schema, and the final field should contain the _sec tag.
+        Adds a redaction step to the aggregation pipeline for a given security enabled field (fields that contain
+        the _sec label).
     """
-    if path is None:
-        path = ""
-    if path is not "":
+    if path != "" and path is not None:
         path = '{}.'.format(path)
     pipeline.append(add_match_field_non_array("{}cat_matches".format(path), "${}_sec.cat".format(path), "_cat"))
     pipeline.append(add_match_field("{}diss_matches".format(path), "${}_sec.diss".format(path), "_diss"))
@@ -157,7 +142,7 @@ def add_match_field(new_field_name, rule_field_name, user_context_attrib):
 def redact_logical_AND(field):
     """
     If all rules were satisfied, keep this element. Else, redact.
-    Note - field must be prefixed with `$` (e.g. ""$dist_matches"")
+    Note - field argument must start with `$` (e.g. ""$dist_matches"")
     """
     stage = {
         "$redact": {
@@ -178,33 +163,8 @@ def redact_logical_AND(field):
     return stage
 
 
-def redact_logical_OR(field):
-    """
-    If at least one ascl rule was satisfied, keep this element. Else, redact.
-    Note - field must be prefixed with `$` (e.g. ""$dist_matches"")
-    """
-    stage = {
-        "$redact": {
-            "$cond": {
-                "if": {
-                    "$setIsSubset": [
-                        ["true"],
-                        {
-                            "$ifNull": [field, ["true"]]  # if field is not set, don't redact
-                        }
-                    ]
-                },
-                "then": "$$DESCEND",
-                "else": "$$PRUNE"
-            }
-        }
-    }
-    return stage
-
-
 def remove_metadata_fields(fields):
     """ Strip out fields added during aggregation. """
-    print('fields to remove: {}'.format(fields))
     stage = {"$project": {}}
     for field in fields:
         stage['$project'][field] = 0

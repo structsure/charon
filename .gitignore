@@ -10,3 +10,5 @@ src/.coverage
 static/*
 dev/*
 env.list
+.coverage
+_build/

@@ -1,7 +1,13 @@
 Quickstart
 ============
 
-This guide will walk through setting up a demo instance of Charon. 
+This guide shows how to set up an instance of Charon and start using it to securely manage your data.
+
+First, we download and build Docker containers for Charon and MongoDB.
+
+Next, we configure Charon with our custom object schema.
+
+Finally, we insert, read, update, and delete data using Charon's security-aware REST API.
 
 Set up Charon
 ----------------
@@ -22,8 +28,7 @@ Create a file called `env.list` and add the following to it: ::
     MONGO_DBNAME=charon-demo-db
     MONGO_HOST=charon-mongo
     S3_ATTACHMENTS=False
-    SCHEMA={"fees": {"Notes": {"type": "string"},"FeeAmount" : {"type": "string"},"FeeID" : {"type": "string"},"FeeIssuedDate" : {"type": "string"},"FeeType": {"type": "string"},"attachments": {"type": "dict","schema": {"_sec": {"type": "dict","schema": {"cat": {"type": "string"},"diss": {"type": "list","schema": {"type": "string"}}}},"documents": {"type": "list"}}},"_sec" : {"type": "dict","schema": {"cat": {"type": "string"},"diss": {"type": "list","schema": {"type": "string"}}}}}}
-
+    SCHEMA={"fees": {"FeeAmount": {"type": "string"},"FeeID": {"type": "string"},"FeeIssuedDate": {"type": "string"},"FeeType": {"type": "string"},"Notes": {"type": "string"},"attachments": {"type": "dict","schema": {"_sec": {"type": "dict","schema": {"cat": {"type": "string"},"diss": {"type": "list","schema": {"type": "string"}}}},"documents": {"type": "list"}}},"_sec": {"type": "dict","schema": {"cat": {"type": "string"},"diss": {"type": "list","schema": {"type": "string"}}}}}}
 
 Create Docker network
 ~~~~~~~~~~~~~~~~~~~~~
@@ -43,14 +48,32 @@ Pull down the Docker image for Mongo: ::
 
 Run a container using this image on your bridge network: ::
 
-    docker run -p 27017:27017 --network=charon-network --name=charon-mongo mongo
+    docker run -p 27017:27017 --network=charon-network --name=charon-mongo -d mongo
+
+Charon uses a Mongo collection called ``charon_user_permissions`` in the ``admin`` database to store the security context for each user. We will use two users in the quickstart, so we will add their credentials now. We will start by bringing up the Mongo shell from the command line: ::
+
+    $ mongo
+
+Next, we will add the users. Copy and paste the following lines into the Mongo shell to add the two users we will need: ::
+
+    use admin
+    db.charon_user_permissions.insert({
+        "username": "us_topsecret_cumul",
+        "cat": ["usg_unclassified", "usg_confidential", "usg_secret", "usg_topsecret"],
+        "diss": ["usg_noforn", "usg_relfvey", "usg_relgbr"]})
+    db.charon_user_permissions.insert({
+        "username": "us_unclassified_only",
+        "cat": ["usg_unclassified"],
+        "diss": ["usg_noforn", "usg_relfvey", "usg_relgbr"]})
+    quit()
+
 
 
 Run your Charon instance
 ~~~~~~~~~~~~~~~~~~~~~~~~
 Execute the following to run your Charon instance: ::
 
-    docker run -p 5000:5000/tcp --env-file env.list --network=charon-network charon
+    docker run -p 5000:5000/tcp --env-file env.list --network=charon-network --name=charon -d charon
 
 Use the Charon API
 ------------------
@@ -129,7 +152,7 @@ Suppose we want to change the Fee Amount to 1000.00. We will execute an HTTP ``P
 
 This request requires three pieces of information:
  - The ID of the object to be updated, which goes at the end of the url (e.g. for ``localhost:5000/fees_write/12345``, ``12345`` is the ID)
- - The ETag, which you will receive as metadata from a `GET` request. This is sent in a request header: ``"If-Match: etag-goes-here"``
+ - The ETag, which you will receive as metadata from a ``GET`` request. This is sent in a request header: ``"If-Match: etag-goes-here"``
  - The data to be modified. This should be in the request body, and should be a json string in the form ``{"path.to.field": "new_value"}``
 
 Call the ``fees`` read API described above. Then, replace ``id-goes-here`` and ``etag-goes-here`` in the following command with the ID and ETag from the response, and execute the curl command. ::
@@ -139,6 +162,18 @@ Call the ``fees`` read API described above. Then, replace ``id-goes-here`` and `
 
 
 Now, perform another ``GET`` request for that object to confirm the Fee Amount was updated to ``1000.00``.
+
+Delete Data
+~~~~~~~~~~~
+
+You can delete an object by passing its ID in a ``DELETE`` request.
+
+Delete a specific ``fees`` object
++++++++++++++++++++++++++++++++++
+If we decide the fee is no longer necessary, we can delete it from the database with the following command (use the same ID and ETag you used above). Note that this is a permanent deletion - soft deletes are not currently supported. See Known Issues & Future Development for more info. ::
+
+    curl -X DELETE -H 'Authorization: Basic us_topsecret_cumul' -H "If-Match: etag-goes-here" localhost:5000/fees_write/id-goes-here
+
 
 Use Charon Security Rules
 -------------------------

@@ -35,6 +35,7 @@ def include_s3_data(endpoint, documents):
 
 
 def get_s3_object(s3, s3key):
+    """Get data from S3 for a given object, based on its S3 key. Attempt to decode as UTF-8 and base64."""
     att_obj = s3.get_object(
         Bucket=current_app.config.get('AWS_S3_BUCKET_NAME'),
         Key=s3key,
@@ -46,24 +47,26 @@ def get_s3_object(s3, s3key):
     # Replace with logic based on content-type if that is added to S3
     try:
         att_data = att_body.decode('utf-8')
-        # attachment_data.append(att_data)
         return att_data
-    except Exception as exc:
-        # TO DO - make this a log statement
-        print('exception using utf-8 decoding: {}'.format(exc))
+    except Exception:
+        current_app.logger.debug('Cannot decode S3 key {} as base64.'.format(s3key))
     try:
         att_data = str(base64.b64decode(att_body))
         return att_data
-    except Exception as exc:
-        # TO DO - make this a log statement
-        print('Exception using base 64 decoding: {}'.format(exc))
+    except Exception:
+        current_app.logger.debug('Cannot decode S3 key {} as base64.'.format(s3key))
 
-    # TO DO - make this a log statement
-    print('Could not decode attachment for key {}; casting to string'.format(s3key))
+    current_app.logger.error('Error decoding S3 data for key {}.'.format(s3key))
     return str(att_body)
 
 
 def generate_presigned_urls(resource, request, lookup=None):
+    """
+    Create presigned urls for each element in the request attachment.documents list. Uses the value in the
+    list as the S3 key for the presigned url.
+
+    Presigned urls are added to the Flask global context (g.presigned_urls).
+    """
     # If not configured to use S3 Attachments, don't generate presigned urls for contents of attachments array
     if not current_app.config.get('S3_ATTACHMENTS') == "True":
         return
@@ -86,6 +89,7 @@ def generate_presigned_urls(resource, request, lookup=None):
 
 
 def get_presigned_url(key):
+    """Create a presigned POST url for a given key."""
     s3 = boto3.client(
         's3',
         aws_access_key_id=current_app.config.get('AWS_ACCESS_KEY'),
@@ -110,6 +114,7 @@ def get_presigned_url(key):
 
 
 def include_presigned_urls(resource, request, payload):
+    """Add presigned urls stored in the Flask global context (g.presigned_urls) to the response payload."""
     # If not configured to use S3 Attachments, don't attempt to add presigned urls to response payload
     if not current_app.config.get('S3_ATTACHMENTS') == "True":
         return
