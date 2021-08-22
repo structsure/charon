@@ -6,7 +6,7 @@ RUN mkdir /eve
 WORKDIR /eve
 
 ADD requirements.txt /eve/
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src /eve/src
 WORKDIR /eve/src
